@@ -1,0 +1,17 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/target/
+backend/uploads/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.DS_Store
+.idea/
+.vscode/

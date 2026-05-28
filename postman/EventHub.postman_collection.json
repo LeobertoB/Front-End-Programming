@@ -1,0 +1,866 @@
+{
+  "info": {
+    "_postman_id": "f09a4af5-4f16-4bf6-8428-eventhub0001",
+    "name": "EventHub API",
+    "description": "Complete EventHub backend test collection. Run the auth requests first to populate role-specific JWT variables, then run catalog/event/user/admin requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "userToken",
+      "value": ""
+    },
+    {
+      "key": "organizerToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    },
+    {
+      "key": "venueId",
+      "value": "1"
+    },
+    {
+      "key": "eventId",
+      "value": "1"
+    },
+    {
+      "key": "bookingId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('userToken', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user.eventhub@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Regular\",\n  \"surname\": \"User\",\n  \"profileImageUrl\": \"https://example.com/user.jpg\",\n  \"city\": \"Rome\",\n  \"favoriteEventType\": \"Music\",\n  \"role\": \"ROLE_USER\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Register Organizer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('organizerToken', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"organizer.eventhub@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Event\",\n  \"surname\": \"Organizer\",\n  \"profileImageUrl\": \"https://example.com/organizer.jpg\",\n  \"city\": \"Rome\",\n  \"favoriteEventType\": \"Conference\",\n  \"role\": \"ROLE_ORGANIZER\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Register Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.eventhub@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Platform\",\n  \"surname\": \"Admin\",\n  \"profileImageUrl\": \"https://example.com/admin.jpg\",\n  \"city\": \"Rome\",\n  \"favoriteEventType\": \"Operations\",\n  \"role\": \"ROLE_ADMIN\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('userToken', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user.eventhub@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Role Checks",
+      "item": [
+        {
+          "name": "Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/me"
+          }
+        },
+        {
+          "name": "Update Profile Image",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileImageUrl\": \"https://example.com/updated-profile.jpg\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/me/profile-image"
+          }
+        },
+        {
+          "name": "Upload Profile Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/users/me/profile-image/upload"
+          }
+        },
+        {
+          "name": "Organizer Ping",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/organizer/ping"
+          }
+        },
+        {
+          "name": "Admin Ping",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/ping"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/categories"
+          }
+        },
+        {
+          "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('categoryId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Music\",\n  \"description\": \"Live performances, festivals, and concerts\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/categories"
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Music & Culture\",\n  \"description\": \"Updated category for music and cultural events\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/categories/{{categoryId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Venues",
+      "item": [
+        {
+          "name": "List Venues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/venues"
+          }
+        },
+        {
+          "name": "List Venues By City",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/venues?city=Rome"
+          }
+        },
+        {
+          "name": "Create Venue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('venueId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Central Hall\",\n  \"city\": \"Rome\",\n  \"country\": \"Italy\",\n  \"address\": \"Via Roma 10\",\n  \"capacity\": 500,\n  \"latitude\": 41.9028,\n  \"longitude\": 12.4964\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/venues"
+          }
+        },
+        {
+          "name": "Update Venue",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Central Hall Updated\",\n  \"city\": \"Rome\",\n  \"country\": \"Italy\",\n  \"address\": \"Via Roma 12\",\n  \"capacity\": 650,\n  \"latitude\": 41.9028,\n  \"longitude\": 12.4964\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/venues/{{venueId}}"
+          }
+        },
+        {
+          "name": "Country Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/venues/country-info?country=Italy"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('eventId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Summer Jazz Night\",\n  \"description\": \"A curated evening of live jazz and food.\",\n  \"startsAt\": \"2026-08-15T20:00:00\",\n  \"endsAt\": \"2026-08-15T23:00:00\",\n  \"basePrice\": 25.00,\n  \"availableSeats\": 120,\n  \"imageUrl\": \"https://example.com/event.jpg\",\n  \"venueId\": {{venueId}},\n  \"categoryId\": {{categoryId}},\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": "{{baseUrl}}/api/organizer/events"
+          }
+        },
+        {
+          "name": "List Events With Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events?city=Rome&categoryId={{categoryId}}&status=PUBLISHED&page=0&size=5&sort=startsAt,asc"
+          }
+        },
+        {
+          "name": "List Managed Events Including Drafts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/organizer/events?size=50&sort=startsAt,desc"
+          }
+        },
+        {
+          "name": "Create Draft Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('draftEventId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Private Planning Session\",\n  \"description\": \"A draft event used to validate organizer editing before publication.\",\n  \"startsAt\": \"2026-09-10T18:00:00\",\n  \"endsAt\": \"2026-09-10T20:00:00\",\n  \"basePrice\": 15.00,\n  \"availableSeats\": 40,\n  \"imageUrl\": \"https://example.com/draft-event.jpg\",\n  \"venueId\": {{venueId}},\n  \"categoryId\": {{categoryId}},\n  \"status\": \"DRAFT\"\n}"
+            },
+            "url": "{{baseUrl}}/api/organizer/events"
+          }
+        },
+        {
+          "name": "Event Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events/{{eventId}}"
+          }
+        },
+        {
+          "name": "Event Weather",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events/{{eventId}}/weather"
+          }
+        },
+        {
+          "name": "Update Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Summer Jazz Night Updated\",\n  \"description\": \"Updated event description with more details.\",\n  \"startsAt\": \"2026-08-15T20:00:00\",\n  \"endsAt\": \"2026-08-15T23:30:00\",\n  \"basePrice\": 28.00,\n  \"availableSeats\": 110,\n  \"imageUrl\": \"https://example.com/event-updated.jpg\",\n  \"venueId\": {{venueId}},\n  \"categoryId\": {{categoryId}},\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": "{{baseUrl}}/api/organizer/events/{{eventId}}"
+          }
+        },
+        {
+          "name": "Upload Event Cover Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/organizer/events/{{eventId}}/image/upload"
+          }
+        },
+        {
+          "name": "Upload Event Gallery Images",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "files",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/organizer/events/{{eventId}}/gallery"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings And Reviews",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('bookingId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": {{eventId}},\n  \"quantity\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/bookings"
+          }
+        },
+        {
+          "name": "My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/bookings/me"
+          }
+        },
+        {
+          "name": "Create Review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('reviewId', json.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": {{eventId}},\n  \"rating\": 5,\n  \"comment\": \"Excellent event organization.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reviews"
+          }
+        },
+        {
+          "name": "My Reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reviews/me"
+          }
+        },
+        {
+          "name": "Manageable Reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reviews/manageable"
+          }
+        },
+        {
+          "name": "Reply To Review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reply\": \"Thank you for attending. We are glad you enjoyed the event.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reviews/{{reviewId}}/reply"
+          }
+        },
+        {
+          "name": "User Follow Up To Official Reply",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"followUp\": \"Thanks for the clarification. I will join again.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reviews/{{reviewId}}/follow-up"
+          }
+        },
+        {
+          "name": "Event Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events/{{eventId}}/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Admin Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "description": "Run these requests after the main collection flow if you want to remove the demo records.",
+      "item": [
+        {
+          "name": "Delete Event Gallery Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/organizer/events/{{eventId}}/gallery/{{eventImageId}}"
+          }
+        },
+        {
+          "name": "Delete Event",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{organizerToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/organizer/events/{{eventId}}"
+          }
+        },
+        {
+          "name": "Delete Venue",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/venues/{{venueId}}"
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/categories/{{categoryId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validation And Error Examples",
+      "item": [
+        {
+          "name": "Invalid Category Payload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"description\": \"\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/categories"
+          }
+        },
+        {
+          "name": "Forbidden Admin Access As User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/stats"
+          }
+        }
+      ]
+    }
+  ]
+}
